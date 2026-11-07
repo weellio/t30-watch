@@ -47,7 +47,9 @@ class WatchRepository @Inject constructor(
     private val log: RawLog,
     @param:AppScope private val scope: CoroutineScope,
 ) {
-    val connection: StateFlow<ConnectionState> = client.state
+    /** Demo build: always "connected" to a pretend watch; nothing touches Bluetooth. */
+    val connection: StateFlow<ConnectionState> =
+        if (com.t30watch.BuildConfig.DEMO) MutableStateFlow(com.t30watch.demo.Demo.connection) else client.state
     val bluetoothOn: StateFlow<Boolean> = client.bluetoothOn
     val lastWatch: Flow<KnownDeviceEntity?> = knownDevices.observeAll().map { it.firstOrNull() }
 
@@ -58,7 +60,7 @@ class WatchRepository @Inject constructor(
     private val _scanError = MutableStateFlow<String?>(null)
     val scanError: StateFlow<String?> = _scanError.asStateFlow()
 
-    private val _battery = MutableStateFlow<BatteryInfo?>(null)
+    private val _battery = MutableStateFlow<BatteryInfo?>(if (com.t30watch.BuildConfig.DEMO) com.t30watch.demo.Demo.battery else null)
     val battery: StateFlow<BatteryInfo?> = _battery.asStateFlow()
     private val _batteryError = MutableStateFlow<String?>(null)
     val batteryError: StateFlow<String?> = _batteryError.asStateFlow()
@@ -132,6 +134,7 @@ class WatchRepository @Inject constructor(
      * If Bluetooth isn't ready yet (just after a reboot), the reconnect loop keeps trying.
      */
     suspend fun autoConnectLast() {
+        if (com.t30watch.BuildConfig.DEMO) return
         if (connection.value !is ConnectionState.Disconnected) return
         val last = knownDevices.observeAll().first().firstOrNull() ?: return
         log.app("auto-connect", last.mac)

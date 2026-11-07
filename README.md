@@ -7,6 +7,29 @@ or your watch's MAC address to Veepoo or anyone else. Your data stays in the app
 
 > Not a medical device. Wrist blood pressure is an optical estimate. Check worrying readings with a cuff and a doctor.
 
+<p align="center">
+  <img src="docs/screenshots/today-dark.png" width="24%" alt="Today: level, quests, steps">
+  <img src="docs/screenshots/insights-heart-dark.png" width="24%" alt="Insights: resting heart rate and trend">
+  <img src="docs/screenshots/progress-light.png" width="24%" alt="Progress: level, streaks, daily quests">
+  <img src="docs/screenshots/themes-light.png" width="24%" alt="15 colour styles">
+</p>
+
+## Screenshots
+
+Screenshots use made-up demo data (see [Demo build](#demo-build)).
+
+| Today | Heart rate | Insights: heart | Insights: blood pressure |
+|---|---|---|---|
+| <img src="docs/screenshots/today-light.png" width="200" alt="Today, light theme"> | <img src="docs/screenshots/today-heart-dark.png" width="200" alt="Heart rate labelled resting, blood pressure category"> | <img src="docs/screenshots/insights-light.png" width="200" alt="Insights heart card, light theme"> | <img src="docs/screenshots/insights-bp-dark.png" width="200" alt="Blood pressure 7-day average and trend"> |
+
+| Progress | Badges | New badge pop-up | Workouts + personal bests |
+|---|---|---|---|
+| <img src="docs/screenshots/progress-dark.png" width="200" alt="Level, streaks, quests"> | <img src="docs/screenshots/badges-dark.png" width="200" alt="Badge grid"> | <img src="docs/screenshots/new-badges.png" width="200" alt="New badges celebration"> | <img src="docs/screenshots/workouts-dark.png" width="200" alt="Workout log with personal bests"> |
+
+| History: heart rate | History: sleep | Themes |
+|---|---|---|
+| <img src="docs/screenshots/history-heart-dark.png" width="200" alt="Weekly heart rate"> | <img src="docs/screenshots/history-sleep-light.png" width="200" alt="Weekly sleep vs goal"> | <img src="docs/screenshots/themes-light.png" width="200" alt="Colour style picker"> |
+
 ## What it does
 
 | Tab | What you get |
@@ -65,6 +88,17 @@ The same goes for BLE tools like nRF Connect, which can hold the connection in t
    From a terminal: `./gradlew :app:installDebug` (Windows: `.\gradlew.bat :app:installDebug`).
 
 Requires Android 8.0 or newer.
+
+### Demo build
+
+Want to look around without a watch? The demo build installs next to the real app (its own data), fills itself with
+three weeks of made-up data, and never uses Bluetooth:
+
+```sh
+./gradlew :app:installDemo
+```
+
+It's also in [Releases](../../releases) as `t30-watch-demo-*.apk`.
 
 ## First run
 

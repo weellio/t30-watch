@@ -15,8 +15,8 @@ android {
         applicationId = "com.t30watch"
         minSdk = 26
         targetSdk = 37
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.1.1"
     }
 
     buildTypes {
@@ -25,6 +25,18 @@ android {
             // Veepoo/JieLi SDKs (they rely on reflection + JNI by class name).
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            buildConfigField("boolean", "DEMO", "false")
+        }
+        debug {
+            buildConfigField("boolean", "DEMO", "false")
+        }
+        // Screenshot / try-it build: installs beside the real app (own database), fills itself with made-up data
+        // and never talks to a watch. Build: gradlew :app:installDemo
+        create("demo") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".demo"
+            matchingFallbacks += "debug"
+            buildConfigField("boolean", "DEMO", "true")
         }
     }
 

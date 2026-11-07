@@ -3,7 +3,11 @@ package com.t30watch
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.DisposableEffect
+import com.t30watch.data.settings.DarkMode
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -56,6 +60,17 @@ class MainActivity : ComponentActivity() {
         setContent {
             val s by settings.settings.collectAsStateWithLifecycle(initialValue = null)
             val prefs = s ?: Settings()
+            // Status/navigation bar icons follow the app's light/dark choice, not just the phone's.
+            val systemDark = isSystemInDarkTheme()
+            val dark = when (prefs.darkMode) { DarkMode.SYSTEM -> systemDark; DarkMode.LIGHT -> false; DarkMode.DARK -> true }
+            DisposableEffect(dark) {
+                val transparent = android.graphics.Color.TRANSPARENT
+                enableEdgeToEdge(
+                    statusBarStyle = SystemBarStyle.auto(transparent, transparent) { dark },
+                    navigationBarStyle = SystemBarStyle.auto(LIGHT_SCRIM, DARK_SCRIM) { dark },
+                )
+                onDispose { }
+            }
             T30Theme(themeId = prefs.themeId, darkMode = prefs.darkMode, amoled = prefs.amoled) {
                 // Start the keep-connected service whenever the app comes to the front (it needs the
                 // Bluetooth permission, which may have just been granted).
@@ -68,6 +83,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+/** Same scrims androidx uses by default for the 3-button navigation bar. */
+private val LIGHT_SCRIM = android.graphics.Color.argb(0xe6, 0xFF, 0xFF, 0xFF)
+private val DARK_SCRIM = android.graphics.Color.argb(0x80, 0x1b, 0x1b, 0x1b)
 
 private enum class Tab(val route: String, val label: String, val icon: Int) {
     TODAY("today", "Today", R.drawable.ic_tab_today),

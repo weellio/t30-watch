@@ -40,6 +40,7 @@ data class HistoryView(
     val bp: List<BpSampleEntity> = emptyList(),
     val sleep: List<SleepSessionEntity> = emptyList(),
     val stepGoal: Int = 8000,
+    val sleepGoalMinutes: Int = 480,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -109,6 +110,6 @@ class HistoryViewModel @Inject constructor(
                 )
             }
         }
-        .combine(settings.settings.map { it.profile.stepGoal }) { v, goal -> v.copy(stepGoal = goal) }
+        .combine(settings.settings.map { it.profile }) { v, p -> v.copy(stepGoal = p.stepGoal, sleepGoalMinutes = p.sleepGoalMinutes) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HistoryView())
 }

@@ -37,7 +37,6 @@ import com.t30watch.ui.charts.Series
 import com.t30watch.ui.charts.SleepStrip
 import com.t30watch.util.Time
 import java.text.NumberFormat
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,9 +89,9 @@ fun HistoryScreen(vm: HistoryViewModel = hiltViewModel()) {
 }
 
 private fun rangeTitle(v: HistoryView): String = when (v.span) {
-    Span.DAY -> DateTimeFormatter.ofPattern("EEE d MMM yyyy").format(v.anchor)
-    Span.WEEK -> DateTimeFormatter.ofPattern("d MMM").format(v.from) + " – " + DateTimeFormatter.ofPattern("d MMM").format(v.toExclusive.minusDays(1))
-    Span.MONTH -> DateTimeFormatter.ofPattern("MMMM yyyy").format(v.from)
+    Span.DAY -> com.t30watch.ui.common.Dates.weekdayMonthDayYear.format(v.anchor)
+    Span.WEEK -> com.t30watch.ui.common.Dates.monthDay.format(v.from) + " – " + com.t30watch.ui.common.Dates.monthDay.format(v.toExclusive.minusDays(1))
+    Span.MONTH -> com.t30watch.ui.common.Dates.monthYear.format(v.from)
 }
 
 private fun dayLabels(v: HistoryView): List<String> = when (v.span) {
@@ -165,8 +164,8 @@ private fun SleepBlock(v: HistoryView) {
         val nights = v.days.mapNotNull { it.sleepMin }
         if (nights.isEmpty()) return Empty()
         Headline("avg ${Time.duration(nights.average().toInt())}", "${nights.size} nights · shortest ${Time.duration(nights.min())} · longest ${Time.duration(nights.max())}")
-        BarChart(v.days.map { Bar((it.sleepMin ?: 0) / 60f, highlight = (it.sleepMin ?: 0) >= 420) }, goal = 8f, xLabels = dayLabels(v))
-        Text("Hours asleep per night. Dashed line: 8 h.", style = MaterialTheme.typography.bodySmall)
+        BarChart(v.days.map { Bar((it.sleepMin ?: 0) / 60f, highlight = (it.sleepMin ?: 0) >= v.sleepGoalMinutes) }, goal = v.sleepGoalMinutes / 60f, xLabels = dayLabels(v))
+        Text("Hours asleep per night. Dashed line: your goal (${Time.duration(v.sleepGoalMinutes)}).", style = MaterialTheme.typography.bodySmall)
     }
 }
 

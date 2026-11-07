@@ -67,6 +67,7 @@ class SyncEngine @Inject constructor(
     private val mutex = Mutex()
 
     init {
+        if (com.t30watch.BuildConfig.DEMO) _status.update { it.copy(lastSuccessAt = System.currentTimeMillis() - 12 * 60_000L) }
         scope.launch { watch.readyEvents.collect { onConnected() } }
         scope.launch {
             settings.settings.map { it.autoSyncMinutes }.distinctUntilChanged().collectLatest { minutes ->

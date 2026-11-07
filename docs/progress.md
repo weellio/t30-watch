@@ -18,6 +18,15 @@
 B asked (04:20) to "build the rest" while asleep. Nothing was sent to the watch overnight, and the new
 build was **not installed** (installing auto-starts the service, which would connect and sync).
 
+### Public repo + screenshots (14:35, v0.1.1)
+
+- Public: https://github.com/weellio/t30-watch (MIT). Releases carry the debug APK and the demo APK.
+- **Demo build type** (`gradlew :app:installDemo`, id `com.t30watch.demo`): seeds 3 weeks of made-up data
+  (`demo/DemoData.kt`), shows a pretend connected watch, never touches Bluetooth. Used for README screenshots
+  (`docs/screenshots/`, status bar cropped off). Screenshot driver scripts were in the session scratchpad.
+- Fixed while shooting: status-bar icons now follow the app's light/dark choice; History/Progress dates use the
+  phone's style (Nov 2); chart corner numbers say "max"/"min"; History sleep goal line uses the profile goal.
+
 ### Afternoon build (13:54, installed; 63 unit tests pass; screens not yet seen)
 
 B's asks: US units, explain HR/BP ("good or bad, trending, does exercise matter"), many themes, gamify, workouts, sleep talk.

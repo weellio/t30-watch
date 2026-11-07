@@ -60,7 +60,6 @@ import com.t30watch.ui.charts.BarChart
 import com.t30watch.util.Fmt
 import com.t30watch.util.Time
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 import kotlin.math.roundToInt
 
 /** Progress: level, streaks, daily quests, badges, weekly recap and the workout log. */
@@ -375,7 +374,7 @@ private fun RecapLine(label: String, value: String, delta: Delta?) {
 
 // ---------------------------------------------------------------- workouts
 
-private val dayFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("EEE d MMM", Locale.getDefault())
+private val dayFormat: DateTimeFormatter get() = com.t30watch.ui.common.Dates.weekdayMonthDay
 
 private fun workoutWhen(w: GameWorkout): String =
     dayFormat.format(java.time.Instant.ofEpochMilli(w.startMs).atZone(Time.zone)) + " · " + Time.hhmm(w.startMs)

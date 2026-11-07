@@ -87,8 +87,8 @@ fun LineChart(
     Column(modifier) {
         if (all.isNotEmpty()) {
             Row(Modifier.fillMaxWidth()) {
-                Text("${all.max().toInt()}$yLabelSuffix", fontSize = 10.sp, color = labelColor, modifier = Modifier.weight(1f))
-                Text("${all.min().toInt()}$yLabelSuffix", fontSize = 10.sp, color = labelColor, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
+                Text("max ${all.max().toInt()}$yLabelSuffix", fontSize = 10.sp, color = labelColor, modifier = Modifier.weight(1f))
+                Text("min ${all.min().toInt()}$yLabelSuffix", fontSize = 10.sp, color = labelColor, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
             }
         }
         Canvas(Modifier.fillMaxWidth().height(height)) {
