@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Folders the share sheet may hand out: our logs, the feature dump, and the SDK's own VpSDK logs. -->
+<paths>
+    <external-files-path name="external" path="." />
+    <files-path name="internal" path="." />
+</paths>
