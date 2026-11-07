@@ -53,7 +53,7 @@ The same goes for BLE tools like nRF Connect, which can hold the connection in t
 
 ## Install
 
-**Option 1: download.** Get `app-debug.apk` from [Releases](../../releases). Open it on the phone and allow
+**Option 1: download.** Get the `.apk` from [Releases](../../releases). Open it on the phone and allow
 "install unknown apps".
 
 **Option 2: build it yourself.**
