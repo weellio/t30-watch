@@ -18,6 +18,18 @@
 B asked (04:20) to "build the rest" while asleep. Nothing was sent to the watch overnight, and the new
 build was **not installed** (installing auto-starts the service, which would connect and sync).
 
+### Burst grouping (2026-11-08 10:25, v0.1.3, installed + tested on the watch)
+
+- Night 1 with quiet hours: nothing was forwarded 01:52–07:00 and 17 were held. Sleep synced (9 h, deep 3 h 35).
+- Seen at 10:05: X sent 3 and Gmail 6 within 40 s, so 9 wrist buzzes. New **"One buzz per app per minute"**
+  (default on, More → Notifications): `data/notify/BurstGate.kt` (tested) lets the first through, holds the
+  rest, and sends one "N more notifications" when the minute ends (quiet hours rechecked at flush). Calls are never grouped.
+- Live test: 3 shell notifications → 1 sent at 10:24:54, then "+2" summary at 10:25:54.
+- The double `onNotificationPosted` comes from Android binding the listener twice after an app update
+  (2 binder proxies in `dumpsys notification`). One service instance, so the shared dedupe map drops the
+  copy and nothing is sent twice. Clears on reboot.
+- Notifications posted while the watch is disconnected are dropped (not queued). That's intended.
+
 ### Quiet hours (2026-11-08 01:50, v0.1.2, installed)
 
 B was woken at 1:40 AM by weather notifications buzzing the watch. Source: the Google app's weather card,

@@ -12,6 +12,7 @@ import com.t30watch.ble.VeepooClient
 import com.t30watch.ble.WatchMessage
 import com.t30watch.ble.WatchSettingsClient
 import com.t30watch.data.notify.NotificationLog
+import com.t30watch.data.notify.BurstGate
 import com.t30watch.data.notify.QuietHours
 import com.t30watch.data.settings.AppSettings
 import com.t30watch.di.AppScope
@@ -39,6 +40,7 @@ class NotificationForwarder : NotificationListenerService() {
     private val queue = Channel<Item>(capacity = 32)
     private val recentSent = LinkedHashMap<String, Long>()
     private val shownKeys = LinkedHashSet<String>()
+    private val burst = BurstGate(60_000)
     private var activeCallKey: String? = null
 
     private var worker: kotlinx.coroutines.Job? = null
@@ -140,6 +142,26 @@ class NotificationForwarder : NotificationListenerService() {
                 recentSent.entries.removeIf { now - it.value > 30_000 }
                 if (recentSent.containsKey(dedupe)) return@launch
                 recentSent[dedupe] = now
+            }
+            if (!isCall && s.groupBursts) {
+                when (val d = burst.offer(pkg, now)) {
+                    BurstGate.Decision.Send -> Unit
+                    BurstGate.Decision.Hold -> return@launch
+                    is BurstGate.Decision.HoldAndFlushIn -> {
+                        scope.launch {
+                            kotlinx.coroutines.delay(d.delayMs)
+                            val n = burst.drain(pkg, System.currentTimeMillis())
+                            if (n == 0) return@launch
+                            val s2 = settings.current()
+                            val t = java.time.LocalTime.now()
+                            if (!s2.forwardNotifications || pkg in s2.mutedApps) return@launch
+                            if (s2.quietHours && QuietHours.isQuiet(t.hour * 60 + t.minute, s2.quietStartMin, s2.quietEndMin)) return@launch
+                            log.app("forward summary", "$pkg +$n")
+                            queue.trySend(Item(pkg, appName, WatchMessage.App(categoryFor(pkg), appName, "$n more notification" + if (n == 1) "" else "s")))
+                        }
+                        return@launch
+                    }
+                }
             }
             log.app("forward", "$pkg ${msg.javaClass.simpleName}")
             queue.trySend(Item(pkg, appName, msg))

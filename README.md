@@ -65,6 +65,7 @@ The **Progress** screen covers:
 - **Quiet hours** (on by default, 10 PM to 7 AM): the watch doesn't buzz overnight, but calls still come through.
   Your phone still rings and shows everything.
 - Notifications the phone shows silently (weather cards, sync status) never buzz the watch.
+- One buzz per app per minute: when an app sends a pile at once (5 emails), you get the first and then one "4 more".
 
 Firmware updates and watch-face uploads are **not** included. They can brick the watch.
 

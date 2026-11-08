@@ -64,6 +64,8 @@ data class Settings(
     val quietAllowCalls: Boolean = true,
     /** Don't forward notifications the phone itself shows silently (weather cards, sync status, promos). */
     val skipSilent: Boolean = true,
+    /** One buzz per app per minute; the rest arrive as one "N more" summary. Calls are never grouped. */
+    val groupBursts: Boolean = true,
     /** Write synced data to Health Connect after each sync. */
     val healthConnectAutoExport: Boolean = false,
     val profile: Profile = Profile(),
@@ -94,6 +96,7 @@ class AppSettings @Inject constructor(@param:ApplicationContext private val cont
         val QUIET_END = intPreferencesKey("quiet_end_min")
         val QUIET_CALLS = booleanPreferencesKey("quiet_allow_calls")
         val SKIP_SILENT = booleanPreferencesKey("skip_silent")
+        val GROUP_BURSTS = booleanPreferencesKey("group_bursts")
         val HC_AUTO_EXPORT = booleanPreferencesKey("hc_auto_export")
         val HEIGHT = intPreferencesKey("profile_height_cm")
         val WEIGHT = intPreferencesKey("profile_weight_kg")
@@ -127,6 +130,7 @@ class AppSettings @Inject constructor(@param:ApplicationContext private val cont
             quietEndMin = p[Keys.QUIET_END] ?: defaults.quietEndMin,
             quietAllowCalls = p[Keys.QUIET_CALLS] ?: defaults.quietAllowCalls,
             skipSilent = p[Keys.SKIP_SILENT] ?: defaults.skipSilent,
+            groupBursts = p[Keys.GROUP_BURSTS] ?: defaults.groupBursts,
             healthConnectAutoExport = p[Keys.HC_AUTO_EXPORT] ?: defaults.healthConnectAutoExport,
             profile = Profile(
                 heightCm = p[Keys.HEIGHT] ?: dp.heightCm,
@@ -164,6 +168,7 @@ class AppSettings @Inject constructor(@param:ApplicationContext private val cont
     suspend fun setQuietEnd(minute: Int) = context.dataStore.edit { it[Keys.QUIET_END] = minute }
     suspend fun setQuietAllowCalls(value: Boolean) = context.dataStore.edit { it[Keys.QUIET_CALLS] = value }
     suspend fun setSkipSilent(value: Boolean) = context.dataStore.edit { it[Keys.SKIP_SILENT] = value }
+    suspend fun setGroupBursts(value: Boolean) = context.dataStore.edit { it[Keys.GROUP_BURSTS] = value }
     suspend fun setHealthConnectAutoExport(value: Boolean) = context.dataStore.edit { it[Keys.HC_AUTO_EXPORT] = value }
 
     suspend fun setAppMuted(pkg: String, muted: Boolean) = context.dataStore.edit {

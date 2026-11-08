@@ -174,6 +174,7 @@ fun MoreScreen(onOpenDebug: () -> Unit, vm: MoreViewModel = hiltViewModel()) {
                             SwitchRow("Let phone calls through", "Calls still buzz the watch during quiet hours.", settings.quietAllowCalls, vm::setQuietAllowCalls)
                         }
                         SwitchRow("Skip silent notifications", "If the phone shows it without a sound or buzz (weather, sync status, promos), the watch won't buzz either.", settings.skipSilent, vm::setSkipSilent)
+                        SwitchRow("One buzz per app per minute", "When an app sends several at once (5 emails), you get the first one, then a single \"4 more\".", settings.groupBursts, vm::setGroupBursts)
                         val list = apps.values.sortedByDescending { it.lastSeen }.take(15)
                         if (list.isNotEmpty()) {
                             Text("Recent apps (switch off to never forward)", style = MaterialTheme.typography.titleSmall)

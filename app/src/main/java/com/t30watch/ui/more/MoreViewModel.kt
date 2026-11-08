@@ -72,6 +72,7 @@ class MoreViewModel @Inject constructor(
     fun setQuietEnd(minute: Int) = viewModelScope.launch { store.setQuietEnd(minute) }
     fun setQuietAllowCalls(on: Boolean) = viewModelScope.launch { store.setQuietAllowCalls(on) }
     fun setSkipSilent(on: Boolean) = viewModelScope.launch { store.setSkipSilent(on) }
+    fun setGroupBursts(on: Boolean) = viewModelScope.launch { store.setGroupBursts(on) }
 
     /** True when the user has granted Notification access to this app. */
     fun hasNotificationAccess(): Boolean =
