@@ -165,6 +165,15 @@ fun MoreScreen(onOpenDebug: () -> Unit, vm: MoreViewModel = hiltViewModel()) {
                             Text("Needs Notification access.", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                             Button(onClick = { context.startActivity(Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }) { Text("Open Notification access") }
                         }
+                        SwitchRow("Quiet hours", "The watch stays still overnight. Your phone still rings and shows everything.", settings.quietHours, vm::setQuietHours)
+                        if (settings.quietHours) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                TimeButton("From", settings.quietStartMin, vm::setQuietStart)
+                                TimeButton("To", settings.quietEndMin, vm::setQuietEnd)
+                            }
+                            SwitchRow("Let phone calls through", "Calls still buzz the watch during quiet hours.", settings.quietAllowCalls, vm::setQuietAllowCalls)
+                        }
+                        SwitchRow("Skip silent notifications", "If the phone shows it without a sound or buzz (weather, sync status, promos), the watch won't buzz either.", settings.skipSilent, vm::setSkipSilent)
                         val list = apps.values.sortedByDescending { it.lastSeen }.take(15)
                         if (list.isNotEmpty()) {
                             Text("Recent apps (switch off to never forward)", style = MaterialTheme.typography.titleSmall)
@@ -215,6 +224,18 @@ fun MoreScreen(onOpenDebug: () -> Unit, vm: MoreViewModel = hiltViewModel()) {
             }
         }
     }
+}
+
+/** Shows a time in the phone's own style (9:00 PM or 21:00) and opens the clock picker. */
+@Composable
+private fun TimeButton(label: String, minute: Int, onPick: (Int) -> Unit) {
+    val ctx = LocalContext.current
+    val is24 = android.text.format.DateFormat.is24HourFormat(ctx)
+    val shown = java.time.LocalTime.of(minute / 60, minute % 60)
+        .format(java.time.format.DateTimeFormatter.ofLocalizedTime(java.time.format.FormatStyle.SHORT))
+    OutlinedButton(onClick = {
+        android.app.TimePickerDialog(ctx, { _, h, m -> onPick(h * 60 + m) }, minute / 60, minute % 60, is24).show()
+    }) { Text("$label $shown") }
 }
 
 @Composable

@@ -18,6 +18,20 @@
 B asked (04:20) to "build the rest" while asleep. Nothing was sent to the watch overnight, and the new
 build was **not installed** (installing auto-starts the service, which would connect and sync).
 
+### Quiet hours (2026-11-08 01:50, v0.1.2, installed)
+
+B was woken at 1:40 AM by weather notifications buzzing the watch. Source: the Google app's weather card,
+posted at importance MIN with ONLY_ALERT_ONCE (silent on the phone). B needs work calls overnight, so phone DND
+is not an option.
+- **Quiet hours** (More → Notifications, default on, 22:00–07:00): nothing is forwarded in the window except
+  calls ("Let phone calls through", default on). Phone untouched. Logic in `data/notify/QuietHours.kt`, tested.
+- **Skip silent notifications** (default on, any hour): if the phone's ranking importance is below DEFAULT,
+  don't forward. Updates to an already-shown ONLY_ALERT_ONCE notification are also skipped.
+- Verified on the phone (locked): a shell test notification and system notifications logged
+  "quiet hours, not forwarded". The More screen layout wasn't seen yet (phone locked).
+- Seen in the log: each notification triggers `onNotificationPosted` twice ("listener connected" also logs
+  twice). The 30 s dedupe stops double sends; worth a look later.
+
 ### Public repo + screenshots (14:35, v0.1.1)
 
 - Public: https://github.com/weellio/t30-watch (MIT). Releases carry the debug APK and the demo APK.

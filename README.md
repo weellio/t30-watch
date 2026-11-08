@@ -62,6 +62,9 @@ The **Progress** screen covers:
 - The app keeps the watch connected and reconnects on its own.
 - It syncs only new data every hour.
 - It forwards phone notifications to the watch, and pauses forwarding while the phone is in Do Not Disturb.
+- **Quiet hours** (on by default, 10 PM to 7 AM): the watch doesn't buzz overnight, but calls still come through.
+  Your phone still rings and shows everything.
+- Notifications the phone shows silently (weather cards, sync status) never buzz the watch.
 
 Firmware updates and watch-face uploads are **not** included. They can brick the watch.
 

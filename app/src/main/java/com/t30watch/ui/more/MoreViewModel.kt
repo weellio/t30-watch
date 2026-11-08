@@ -67,6 +67,11 @@ class MoreViewModel @Inject constructor(
     fun setHcAuto(on: Boolean) = viewModelScope.launch { store.setHealthConnectAutoExport(on) }
     fun setForward(on: Boolean) = viewModelScope.launch { store.setForwardNotifications(on) }
     fun setMuted(pkg: String, muted: Boolean) = viewModelScope.launch { store.setAppMuted(pkg, muted) }
+    fun setQuietHours(on: Boolean) = viewModelScope.launch { store.setQuietHours(on) }
+    fun setQuietStart(minute: Int) = viewModelScope.launch { store.setQuietStart(minute) }
+    fun setQuietEnd(minute: Int) = viewModelScope.launch { store.setQuietEnd(minute) }
+    fun setQuietAllowCalls(on: Boolean) = viewModelScope.launch { store.setQuietAllowCalls(on) }
+    fun setSkipSilent(on: Boolean) = viewModelScope.launch { store.setSkipSilent(on) }
 
     /** True when the user has granted Notification access to this app. */
     fun hasNotificationAccess(): Boolean =

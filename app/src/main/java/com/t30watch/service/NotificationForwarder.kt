@@ -12,6 +12,7 @@ import com.t30watch.ble.VeepooClient
 import com.t30watch.ble.WatchMessage
 import com.t30watch.ble.WatchSettingsClient
 import com.t30watch.data.notify.NotificationLog
+import com.t30watch.data.notify.QuietHours
 import com.t30watch.data.settings.AppSettings
 import com.t30watch.di.AppScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,6 +38,7 @@ class NotificationForwarder : NotificationListenerService() {
 
     private val queue = Channel<Item>(capacity = 32)
     private val recentSent = LinkedHashMap<String, Long>()
+    private val shownKeys = LinkedHashSet<String>()
     private var activeCallKey: String? = null
 
     private var worker: kotlinx.coroutines.Job? = null
@@ -83,6 +85,17 @@ class NotificationForwarder : NotificationListenerService() {
         val text = (extras.getCharSequence(Notification.EXTRA_BIG_TEXT) ?: extras.getCharSequence(Notification.EXTRA_TEXT))?.toString().orEmpty()
         val appName = appLabel(pkg)
         notifyLog.seen(pkg, appName)
+        // How loud the phone itself treats this one. Below DEFAULT = no sound or vibration on the phone.
+        val importance = runCatching {
+            val r = Ranking()
+            if (currentRanking?.getRanking(sbn.key, r) == true) r.importance else null
+        }.getOrNull()
+        // An app updating a notification it already showed ("only alert once") isn't a new alert.
+        val isRepeat = n.flags and Notification.FLAG_ONLY_ALERT_ONCE != 0 && synchronized(shownKeys) { sbn.key in shownKeys }
+        synchronized(shownKeys) {
+            shownKeys.add(sbn.key)
+            if (shownKeys.size > 200) shownKeys.remove(shownKeys.first())
+        }
 
         scope.launch {
             val s = settings.current()
@@ -92,6 +105,18 @@ class NotificationForwarder : NotificationListenerService() {
             if (currentInterruptionFilter > NotificationManager.INTERRUPTION_FILTER_ALL) return@launch // phone is in DND
             if (n.flags and Notification.FLAG_GROUP_SUMMARY != 0) return@launch
             val isCall = n.category == Notification.CATEGORY_CALL
+            if (s.quietHours && !(isCall && s.quietAllowCalls)) {
+                val now = java.time.LocalTime.now()
+                if (QuietHours.isQuiet(now.hour * 60 + now.minute, s.quietStartMin, s.quietEndMin)) {
+                    log.app("quiet hours, not forwarded", pkg)
+                    return@launch
+                }
+            }
+            if (!isCall && s.skipSilent && importance != null && importance < NotificationManager.IMPORTANCE_DEFAULT) {
+                log.app("silent on phone, not forwarded", pkg)
+                return@launch
+            }
+            if (!isCall && isRepeat) return@launch
             if (!isCall && (n.flags and Notification.FLAG_ONGOING_EVENT != 0 || n.flags and Notification.FLAG_FOREGROUND_SERVICE != 0)) return@launch
             if (title.isBlank() && text.isBlank()) return@launch
 
@@ -122,6 +147,7 @@ class NotificationForwarder : NotificationListenerService() {
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
+        synchronized(shownKeys) { shownKeys.remove(sbn.key) }
         if (sbn.key == activeCallKey) {
             activeCallKey = null
             scope.launch { runCatching { watchSettings.callEnded() } }

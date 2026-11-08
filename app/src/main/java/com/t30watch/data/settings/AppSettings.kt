@@ -56,6 +56,14 @@ data class Settings(
     val forwardNotifications: Boolean = false,
     /** Package names whose notifications are never forwarded. */
     val mutedApps: Set<String> = emptySet(),
+    /** Nightly window when nothing buzzes the watch (except calls, if allowed). The phone itself is untouched. */
+    val quietHours: Boolean = true,
+    val quietStartMin: Int = 22 * 60,
+    val quietEndMin: Int = 7 * 60,
+    /** Phone calls still reach the watch during quiet hours. */
+    val quietAllowCalls: Boolean = true,
+    /** Don't forward notifications the phone itself shows silently (weather cards, sync status, promos). */
+    val skipSilent: Boolean = true,
     /** Write synced data to Health Connect after each sync. */
     val healthConnectAutoExport: Boolean = false,
     val profile: Profile = Profile(),
@@ -81,6 +89,11 @@ class AppSettings @Inject constructor(@param:ApplicationContext private val cont
         val AUTO_SYNC_MINUTES = intPreferencesKey("auto_sync_minutes")
         val FORWARD_NOTIFICATIONS = booleanPreferencesKey("forward_notifications")
         val MUTED_APPS = stringSetPreferencesKey("muted_apps")
+        val QUIET_HOURS = booleanPreferencesKey("quiet_hours")
+        val QUIET_START = intPreferencesKey("quiet_start_min")
+        val QUIET_END = intPreferencesKey("quiet_end_min")
+        val QUIET_CALLS = booleanPreferencesKey("quiet_allow_calls")
+        val SKIP_SILENT = booleanPreferencesKey("skip_silent")
         val HC_AUTO_EXPORT = booleanPreferencesKey("hc_auto_export")
         val HEIGHT = intPreferencesKey("profile_height_cm")
         val WEIGHT = intPreferencesKey("profile_weight_kg")
@@ -109,6 +122,11 @@ class AppSettings @Inject constructor(@param:ApplicationContext private val cont
             autoSyncMinutes = p[Keys.AUTO_SYNC_MINUTES] ?: defaults.autoSyncMinutes,
             forwardNotifications = p[Keys.FORWARD_NOTIFICATIONS] ?: defaults.forwardNotifications,
             mutedApps = p[Keys.MUTED_APPS] ?: defaults.mutedApps,
+            quietHours = p[Keys.QUIET_HOURS] ?: defaults.quietHours,
+            quietStartMin = p[Keys.QUIET_START] ?: defaults.quietStartMin,
+            quietEndMin = p[Keys.QUIET_END] ?: defaults.quietEndMin,
+            quietAllowCalls = p[Keys.QUIET_CALLS] ?: defaults.quietAllowCalls,
+            skipSilent = p[Keys.SKIP_SILENT] ?: defaults.skipSilent,
             healthConnectAutoExport = p[Keys.HC_AUTO_EXPORT] ?: defaults.healthConnectAutoExport,
             profile = Profile(
                 heightCm = p[Keys.HEIGHT] ?: dp.heightCm,
@@ -141,6 +159,11 @@ class AppSettings @Inject constructor(@param:ApplicationContext private val cont
     suspend fun setKeepConnected(value: Boolean) = context.dataStore.edit { it[Keys.KEEP_CONNECTED] = value }
     suspend fun setAutoSyncMinutes(value: Int) = context.dataStore.edit { it[Keys.AUTO_SYNC_MINUTES] = value }
     suspend fun setForwardNotifications(value: Boolean) = context.dataStore.edit { it[Keys.FORWARD_NOTIFICATIONS] = value }
+    suspend fun setQuietHours(value: Boolean) = context.dataStore.edit { it[Keys.QUIET_HOURS] = value }
+    suspend fun setQuietStart(minute: Int) = context.dataStore.edit { it[Keys.QUIET_START] = minute }
+    suspend fun setQuietEnd(minute: Int) = context.dataStore.edit { it[Keys.QUIET_END] = minute }
+    suspend fun setQuietAllowCalls(value: Boolean) = context.dataStore.edit { it[Keys.QUIET_CALLS] = value }
+    suspend fun setSkipSilent(value: Boolean) = context.dataStore.edit { it[Keys.SKIP_SILENT] = value }
     suspend fun setHealthConnectAutoExport(value: Boolean) = context.dataStore.edit { it[Keys.HC_AUTO_EXPORT] = value }
 
     suspend fun setAppMuted(pkg: String, muted: Boolean) = context.dataStore.edit {
